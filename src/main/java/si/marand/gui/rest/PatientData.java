@@ -51,7 +51,7 @@ public class PatientData {
 				builder.append("\"spq2Type\":").append(splitedLine[6]).append(",");
 				
 				DateFormat df = new SimpleDateFormat("d.M.yyyy");
-				DateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
+				DateFormat df2 = new SimpleDateFormat("yyyy-M-d");
 				Date date =  df.parse(splitedLine[7]);
 				
 				builder.append("\"date\":\"").append(df2.format(date)).append("\"},");

@@ -15,136 +15,36 @@
     limitations under the License.
 -->
 <!-- Plain HTML page that kicks us into the app -->
-
 <html>
 <head>
+	<title>domene.arctur.si</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<script src="http://code.highcharts.com/highcharts-more.js"></script>
+	<script src="/marand-gui-task/resources/js/functions.js"></script>
 </head>
 <body>
 	<div id="images"></div>
-	<div id="container" style="width:100%; height:400px;"></div>
+	<div id="bloodPressureChart" style="width:100%; height:400px;"></div>
+	<div id="temperatureChart" style="width:100%; height:400px;"></div>
 	
 <script>
 
-var diastoloc = []; 
-var systolic = [];
-var dates = [];
+$( document ).ready(function() {
 
-/*(function() {
-  var flickerAPI = "http://localhost:8080/marand-gui-task/rest/patient-data/120";
-  $.getJSON( flickerAPI, {
-    tags: "mount rainier",
-    tagmode: "any",
-    format: "json"
-  })
-    .done(function( data ) {
+	var patientData = "http://localhost:8080/marand-gui-task/rest/patient-data/120";
+    $.getJSON( patientData, {
+      format: "json"
+    })
+      .done(function( data ) {
 
-    	var object = data;
-    	var test = data.name;
-    	var test2; 
-        $.each( data.measurements, function( i, item ) {
-            var diastolicMeasurement = [item.date, item.diastoloc];
-        	diastoloc.push(item.diastoloc);
-        	dates.push(item.date);
-        });
-        var test3; 
-    });
-})();*/
+    	  drawBloodPressureData(data);
 
-$(function () {
+    	  drawTemperatureData(data);
+      });
 
-	var test = diastoloc;
-	
-	 var options = {
-		        chart: {
-		            renderTo: 'container',
-		            type: 'area'
-		        },
-		        plotOptions: {
-		            series: {
-		                fillOpacity: 0.5
-		            }
-		        },
-		        title: {
-		            text: 'Blood pressure'
-		        },
-		        subtitle: {
-		            text: 'Diastolic and systolic blood pressure daily measurements'
-		        },
-		        yAxis: {
-		            title: {
-		                text: 'Blood pressure'
-		            }
-		        },
-		        series: [
-		        {
-		            name: 'Systolic',
-		            data: [{}],
-		            type: 'area',
-		            color: 'rgba(255,196,79,1)'
-		        },
-		        {
-		            name: 'Diastolic',
-		            data: [{}],
-		            type: 'area',
-		        	color: '#6087FF'
-		        }]
-		        
-		    };
-
-	        //options.series[0].data = diastoloc;
-	        var chart = new Highcharts.Chart(options);
-
-
-	       /* $.getJSON('data.json', function(data) {
-	            options.series[0].data = data;
-	            var chart = new Highcharts.Chart(options);
-	        });*/
-
-
-	        var patientData = "http://localhost:8080/marand-gui-task/rest/patient-data/120";
-	        $.getJSON( patientData, {
-	          format: "json"
-	        })
-	          .done(function( data ) {
-	              $.each( data.measurements, function( i, item ) {
-	                  var diastolicMeasurement = [item.date, item.diastoloc];
-	              	  diastoloc.push(item.diastoloc);
-	              	  systolic.push(item.systolic);
-	              	  dates.push(item.date);
-	              });
-	              options.series[1].data = diastoloc;
-	              options.series[0].data = systolic;
-		          var chart = new Highcharts.Chart(options);
-	
-	               
-	          });
-	        
-    /*$('#container').highcharts({
-
-    	chart: {
-            type: 'bar'
-        },
-        title: {
-            text: 'Fruit Consumption'
-        },
-        xAxis: {
-            categories: ['Apples', 'Bananas', 'Oranges']
-        },
-        yAxis: {
-            title: {
-                text: 'Fruit eaten'
-            }
-        },
-        series: [{
-            name: 'Jane',
-            data: [1, 0, 4]
-        }, {
-            name: 'John',
-            data: [5, 7, 3]
-        }]
-    });*/
 });
 
 </script>
