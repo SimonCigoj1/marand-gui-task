@@ -29,6 +29,8 @@
 	<div id="images"></div>
 	<div id="bloodPressureChart" style="width:100%; height:400px;"></div>
 	<div id="temperatureChart" style="width:100%; height:400px;"></div>
+	<div id="heartRateChart" style="width:100%; height:400px;"></div>
+	<div id="saturationChart" style="width:100%; height:400px;"></div>
 	
 <script>
 
@@ -43,6 +45,10 @@ $( document ).ready(function() {
     	  drawBloodPressureData(data);
 
     	  drawTemperatureData(data);
+
+    	  drawHeartRateData(data);
+
+    	  drawSaturationData(data)
       });
 
 });
