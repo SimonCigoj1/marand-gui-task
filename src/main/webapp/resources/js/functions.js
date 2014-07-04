@@ -6,6 +6,7 @@ var diastoloc = [];
 var systolic = [];
 var dates = [];
 var temperature = [];
+var feaver = [];
 var heartRate = [];
 var saturation = [];
 var startDate;
@@ -14,6 +15,10 @@ var startDate;
 function parseDate(date){
 	var parts = date.split("-");
    return Date.UTC(parts[0], parts[1]-1, parts[2]); 
+}
+
+function roundToTwo(num) {    
+    return +(Math.round(num + "e+2")  + "e-2");
 }
 
 function drawBloodPressureData(data){
@@ -28,14 +33,17 @@ function drawBloodPressureData(data){
 		            }
 		        },
 		        title: {
-		            text: 'Blood pressure'
+		            text: ''
 		        },
-		        subtitle: {
-		            text: 'Diastolic and systolic blood pressure daily measurements'
+		        legend :{
+		        	align:'right',
+		        	floating:'true',
+		        	verticalAlign: 'top'
 		        },
 		        yAxis: {
+		        	min:30,
 		            title: {
-		                text: 'Blood pressure'
+		                text: ''
 		            }
 		        },
 		        xAxis: {
@@ -118,45 +126,52 @@ function drawBloodPressureData(data){
 
 
 function drawTemperatureData(data){
-	
-
-	  
-	  var startDate = parseDate(data.measurements[0].date); 
-	  
-	  var idealTemperature = 37;
+	 var startDate = parseDate(data.measurements[0].date); 
+	 var idealTemperature = 37;
 	  
       $.each( data.measurements, function( i, item ) {
-    	  
     	  itemDate = parseDate(item.date);
-    	  
     	  var highTmpRange = [];
     	  
-    	  temperature.push(item.temperature);
+    	  tempValue = Number(item.temperature) 
     	  
-
+    	  if(tempValue <= idealTemperature){
+    		  temperature.push(tempValue);
+    		  feaver.push(0);
+    	  }else{
+    		  
+    		  //item.temperature-idealTemperature
+    		  var difference = tempValue - idealTemperature;
+    		  feaver.push(roundToTwo(difference));
+    		  temperature.push(idealTemperature);
+    	  }
       });
 
-     // alert(temperatureHigh);
+    // alert(feaver);
       
  	 var options = {
 		        chart: {
-		            renderTo: 'temperatureChart',
-		            type: 'area'
+		            renderTo: 'temperatureChart'
 		        },
 		        plotOptions: {
 		            series: {
 		                fillOpacity: 0.7
-		            }
+		            },
+		        	column: {
+		        		stacking: 'normal'
+		        	}
 		        },
 		        title: {
-		            text: 'Temperature'
+		            text: ''
 		        },
-		        subtitle: {
-		            text: 'Patient temperature measurements'
+		        legend :{
+		        	align:'right',
+		        	floating:'true',
+		        	verticalAlign: 'top'
 		        },
 		        yAxis: {
 		        	title: {
-		                text: 'Temperature'
+		                text: ''
 		            }
 		        },
 		        xAxis: {
@@ -165,17 +180,42 @@ function drawTemperatureData(data){
 		                day: '%e. %b'
 		            }
 		        },
-		        tooltip: {
-	                valueSuffix: '°C'
+	            tooltip: {
+	                formatter: function() {
+	                	
+	                	var d = new Date();
+	                	d.setTime(this.x);
+	                	
+	                	var day = d.getDate();
+	                	var month = d.getMonth();
+	                	
+	                    return '<b>'+ day + '.' + month +'</b><br/>'+
+	                        'Temperature: '+ this.point.stackTotal + '°C';
+	                }
 	            },
 		        series: [
 		        {
 		            name: 'Temperature',
 		            data: [{}],
-		            type: 'area',
-		            color: '#FFBF6C',
+		            type: 'column',
+		            stack: 'temperature',
+		            color: '#FF6161',
 		            fillOpacity: 0.7,
 		            zIndex:2,
+		            marker: {
+	                    enabled: false
+	                },
+	                animation: false,
+	                pointInterval: 24 * 3600 * 1000 // one day
+		        },
+		        {
+		            name: 'Feaver',
+		            data: [{}],
+		            type: 'column',
+		            stack: 'temperature',
+		            color: '#F6BB42',
+		            fillOpacity: 0.7,
+		            zIndex:3,
 		            marker: {
 	                    enabled: false
 	                },
@@ -184,48 +224,23 @@ function drawTemperatureData(data){
 		        }
 		       ]
 		        
-		    }; 	
+		    }; 
+      
+      
+   
       
       options.series[0].pointStart = startDate;
-      options.series[0].data = temperature;
+      options.series[0].data = feaver;
+      
+      options.series[1].pointStart = startDate;
+      options.series[1].data = temperature;
       
       var maxY = Math.max.apply(Math,temperature)+2; 
       var minY= Math.min.apply(Math,temperature)-2;
       
       options.yAxis.min = minY;
-      options.yAxis.max = maxY;
-      
+         
       var temperatureChart = new Highcharts.Chart(options);
-
-      temperatureChart.yAxis[0].addPlotLine({
-            value: idealTemperature,
-            color: 'blue',
-            width: 1,
-            id: 'plot-line-1',
-            dashStyle: 'ShortDash',
-            zIndex:10,
-            label: {
-            	text: 'feaver 37'
-	            }
-        });
-      
-      temperatureChart.yAxis[0].addPlotBand({
-          from: idealTemperature,
-          to: maxY+2,
-          color: 'rgba(255,0,0,0.1)',
-          id: 'plot-band-1',
-          zIndex:1,
-          fillOpacity: 0.3
-      });
-      
-      temperatureChart.yAxis[0].addPlotBand({
-          from: minY-2,
-          to: idealTemperature,
-          color: 'rgba(104,188,255,0.3)',
-          id: 'plot-band-1',
-          zIndex:1,
-          fillOpacity: 0.3
-      });
       
     
 }
@@ -251,14 +266,14 @@ function drawHeartRateData(data){
 		            }
 		        },
 		        title: {
-		            text: 'Heart Rate'
+		            text: ''
 		        },
-		        subtitle: {
-		            text: 'Patient heart rate measurements'
+		        legend :{
+		        	enabled:false
 		        },
 		        yAxis: {
 		        	title: {
-		                text: 'Heart Rate /min'
+		                text: ''
 		            }
 		        },
 		        xAxis: {
@@ -299,18 +314,7 @@ function drawHeartRateData(data){
     
     var temperatureChart = new Highcharts.Chart(options);
 
-    temperatureChart.yAxis[0].addPlotLine({
-          value: 80,
-          color: 'blue',
-          width: 1,
-          id: 'plot-line-1',
-          dashStyle: 'ShortDash',
-          zIndex:10,
-          label: {
-          	text: 'feaver 37'
-	            }
-      });
- 
+  
     
   
 }
@@ -336,14 +340,14 @@ function drawSaturationData(data){
 		            }
 		        },
 		        title: {
-		            text: 'Saturation'
+		            text: ''
 		        },
-		        subtitle: {
-		            text: 'Oxigen saturation'
+		        legend :{
+		        	enabled:false
 		        },
 		        yAxis: {
 		        	title: {
-		                text: 'Saturatoin in %'
+		                text: ''
 		            }
 		        },
 		        xAxis: {
@@ -360,7 +364,7 @@ function drawSaturationData(data){
 		            name: 'saturation',
 		            data: [{}],
 		            type: 'area',
-		            color: '#FFBF6C',
+		            color: '#3BAFDA',
 		            fillOpacity: 0.7,
 		            zIndex:2,
 		            marker: {
@@ -376,7 +380,7 @@ function drawSaturationData(data){
     options.series[0].pointStart = startDate;
     options.series[0].data = saturation;
     
-    var maxY = Math.max.apply(Math,saturation)+10; 
+    var maxY = Math.max.apply(Math,saturation)+2; 
     var minY= Math.min.apply(Math,saturation)-10;
     
     options.yAxis.min = minY;
@@ -385,15 +389,15 @@ function drawSaturationData(data){
     var saturationChart = new Highcharts.Chart(options);
 
     saturationChart.yAxis[0].addPlotLine({
-          value: 80,
+          value: 100,
           color: 'blue',
           width: 1,
           id: 'plot-line-1',
           dashStyle: 'ShortDash',
           zIndex:10,
           label: {
-          	text: 'feaver 37'
-	            }
+          		text: ''
+	      }
       });
  
     
