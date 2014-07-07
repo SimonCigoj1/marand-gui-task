@@ -129,27 +129,35 @@ function drawTemperatureData(data){
 	 var startDate = parseDate(data.measurements[0].date); 
 	 var idealTemperature = 37;
 	  
-      $.each( data.measurements, function( i, item ) {
+	 var num = 0;
+	 var normalNum = 0;
+	 var feaverNum = 0;
+     $.each( data.measurements, function( i, item ) {
     	  itemDate = parseDate(item.date);
     	  var highTmpRange = [];
     	  
-    	  tempValue = Number(item.temperature) 
-    	  
-    	  if(tempValue <= idealTemperature){
+    	  tempValue = Number(item.temperature); 
+    	  num++;
+    	  if (tempValue <= idealTemperature) {
     		  temperature.push(tempValue);
     		  feaver.push(0);
-    	  }else{
-    		  
-    		  //item.temperature-idealTemperature
+    		  normalNum++;
+    	  } else {
     		  var difference = tempValue - idealTemperature;
     		  feaver.push(roundToTwo(difference));
     		  temperature.push(idealTemperature);
+    		  feaverNum++;
     	  }
-      });
-
-    // alert(feaver);
+    	  
+     });
       
- 	 var options = {
+     var normalTempPercent = (normalNum / num) * 100;
+     var feaverTempPercent = (feaverNum / num) * 100;
+     
+     normalTempPercent = Math.round(normalTempPercent * 100) / 100;
+     feaverTempPercent = Math.round(feaverTempPercent * 100) / 100;
+     
+     var options = {
 		        chart: {
 		            renderTo: 'temperatureChart'
 		        },
@@ -183,19 +191,28 @@ function drawTemperatureData(data){
 	            tooltip: {
 	                formatter: function() {
 	                	
-	                	var d = new Date();
-	                	d.setTime(this.x);
+	                	var s;
+	                    if (this.point.name) { // the pie chart
+	                        s = this.point.name +': '+ this.y +' % of time';
+	                        return s;
+	                    } else {
+	                    	var d = new Date();
+		                	d.setTime(this.x);
+		                	
+		                	var day = d.getDate();
+		                	var month = d.getMonth();
+		                	   	
+		                	
+		                    return '<b>'+ day + '.' + month +'</b><br/>'+
+		                        'Temperature: '+ this.point.stackTotal + '°C';
+	                    }
 	                	
-	                	var day = d.getDate();
-	                	var month = d.getMonth();
 	                	
-	                    return '<b>'+ day + '.' + month +'</b><br/>'+
-	                        'Temperature: '+ this.point.stackTotal + '°C';
 	                }
 	            },
 		        series: [
 		        {
-		            name: 'Temperature',
+		            name: 'Feaver',
 		            data: [{}],
 		            type: 'column',
 		            stack: 'temperature',
@@ -209,7 +226,7 @@ function drawTemperatureData(data){
 	                pointInterval: 24 * 3600 * 1000 // one day
 		        },
 		        {
-		            name: 'Feaver',
+		            name: 'Normal temperature',
 		            data: [{}],
 		            type: 'column',
 		            stack: 'temperature',
@@ -221,14 +238,33 @@ function drawTemperatureData(data){
 	                },
 	                animation: false,
 	                pointInterval: 24 * 3600 * 1000 // one day
-		        }
+		        },
+		        {
+		            type: 'pie',
+		            name: 'Total consumption',
+		            data: [{
+		                name: 'normal temperature',
+		                y: normalTempPercent,
+		                color: '#F6BB42'
+		            }, {
+		                name: 'feaver',
+		                y: feaverTempPercent,
+		                color: '#FF6161'
+		            }],
+		            center: [50, 35],
+		            size: 80,
+		            showInLegend: false,
+		            dataLabels: {
+		                enabled: false
+		                
+		            }
+			}
+		        
 		       ]
 		        
 		    }; 
       
-      
-   
-      
+            
       options.series[0].pointStart = startDate;
       options.series[0].data = feaver;
       
@@ -247,7 +283,7 @@ function drawTemperatureData(data){
 
 function drawHeartRateData(data){
 		  
-	var startDate = parseDate(data.measurements[0].date); 
+	var startDate = new Date(); 
 	  
     $.each( data.measurements, function( i, item ) {
   	   	heartRate.push(item.heartRate);
@@ -297,13 +333,13 @@ function drawHeartRateData(data){
 	                    enabled: false
 	                },
 	                animation: false,
-	                pointInterval: 24 * 3600 * 1000 // one day
+	                pointInterval: 60 * 1000 // one hour
 		        }
 		       ]
 		        
 		    }; 	
     
-    options.series[0].pointStart = startDate;
+    options.series[0].pointStart = startDate.getTime()+3600000;
     options.series[0].data = heartRate;
     
     var maxY = Math.max.apply(Math,heartRate)+10; 
@@ -321,14 +357,16 @@ function drawHeartRateData(data){
 
 function drawSaturationData(data){
 	  
-	var startDate = parseDate(data.measurements[0].date); 
-	  
+	var startDate = new Date();
+	
+	
+	
+	
     $.each( data.measurements, function( i, item ) {
     	saturation.push(item.spq2numerator);
     });
 
-   // alert(temperatureHigh);
-    
+   
 	 var options = {
 		        chart: {
 		            renderTo: 'saturationChart',
@@ -371,13 +409,13 @@ function drawSaturationData(data){
 	                    enabled: false
 	                },
 	                animation: false,
-	                pointInterval: 24 * 3600 * 1000 // one day
+	                pointInterval: 60 * 1000 // one day
 		        }
 		       ]
 		        
 		    }; 	
     
-    options.series[0].pointStart = startDate;
+    options.series[0].pointStart = startDate.getTime()+3600000;
     options.series[0].data = saturation;
     
     var maxY = Math.max.apply(Math,saturation)+2; 

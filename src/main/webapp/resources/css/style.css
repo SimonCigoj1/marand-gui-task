@@ -3,3 +3,50 @@
 	width: 10em;
 	height: 10em;
 }
+
+#patientName{
+	color: #5CA4FF;
+	margin: 0px;
+}
+
+.patientData{
+	color: #37BC9B;
+	width: 300px; 
+	margin-left: auto; 
+	margin-right: auto; 
+	display:inline-block; 
+	text-align:left;
+}
+
+.patientData p {
+	font-size: 1.2em;
+}
+
+.patientData p span{
+	color: #808080;
+}
+
+.light-blue{
+	background-color:#3BAFDA !important; 
+	border-color: #3BAFDA !important;
+	color: #fff !important; 
+}
+
+.light-red{
+	background-color:#DA4453 !important; 
+	border-color: #DA4453 !important;
+	color: #fff !important; 
+}
+
+.light-yellow {
+	background-color:#F6BB42 !important; 
+	border-color: #F6BB42 !important;
+	color: #fff !important; 
+}
+
+.light-green {
+	background-color:#37BC9B !important; 
+	border-color: #37BC9B !important;
+	color: #fff !important; 
+}
+
