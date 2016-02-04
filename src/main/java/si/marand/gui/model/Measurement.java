@@ -1,7 +1,7 @@
 package si.marand.gui.model;
 
 import java.util.Date;
-
+//test test
 public class Measurement {
 
 	private int diastoloc;
